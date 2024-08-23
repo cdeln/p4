@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+prefix=/usr/local/bin
+
+usage="install [-prefix /usr/local/bin] [-help|-h]"
+
+while (( $# )); do
+    case $1 in
+        -prefix)
+            prefix=${2-}
+            shift 2
+            ;;
+        -help|-h)
+            echo "$usage"
+            exit
+            ;;
+        *)
+            echo "Unknown option $1"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -f $prefix ]; then
+    echo "prefix '$prefix' is already a file, please remove it or set another installation prefix"
+    exit
+fi
+
+if [ ! -d $prefix ]; then
+    mkdir -p $prefix
+fi
+
+for f in src/* ; do
+    cp $f $prefix/
+done
