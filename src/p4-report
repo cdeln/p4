@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 
-profile=p4.txt
+profile=profile.p4
+report=report.p4
 
-usage="p4-report [-profile p4.txt] [-help]"
+usage="p4-report [-profile profile.p4] [-report report.p4] [-help|-h]"
 
 while (( $# )); do
     case $1 in
         -profile)
-            profile=$2
-            shift 1
+            profile=${2-}
+            shift 2
             ;;
-        -help)
+        -report)
+            report=${2-}
+            shift 2
+            ;;
+        -help|-h)
             echo "$usage"
             exit
             ;;
@@ -27,4 +32,4 @@ if [ ! -f "$profile" ]; then
 fi
 
 cwd=$(dirname ${BASH_SOURCE[0]})
-$cwd/p4-collect $profile | sort | uniq -c | sort -n
+$cwd/p4-collect $profile | sort | uniq -c | sort -nr > $report

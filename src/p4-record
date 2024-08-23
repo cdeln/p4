@@ -3,12 +3,12 @@
 package require cmdline
 
 set params {
-    {frequency.arg 10       "GDB interrupt and backtrace frequency"}
-    {timeout.arg   3        "Timeout after number of seconds after sending command to GDB"}
-    {threads.arg   1        "Wait for this number of threads before profiling"}
-    {output.arg    "p4.txt" "Output logfile when recording the profile"}
-    {stopat.arg    ""       "Stop profiling at this GDB location"}
-    {verbose                "Show GDB profile session at stdout as well"}
+    {frequency.arg 10           "GDB interrupt and backtrace frequency"}
+    {timeout.arg   3            "Timeout after number of seconds after sending command to GDB"}
+    {threads.arg   0            "Wait for this number of threads before profiling"}
+    {output.arg    "profile.p4" "Output logfile when recording the profile"}
+    {stopat.arg    ""           "Stop profiling at this GDB location"}
+    {verbose                    "Show GDB profile session at stdout as well"}
 }
 
 set usage {[opts...] prog [args...]}
@@ -90,20 +90,22 @@ while {1} {
     send_gdb "interrupt"
     expect {
         timeout {[debug "interrupt"]}
-        "Inferior * exited normally" {exit 0}
-        "Breakpoint" {exit 0}
+        "Inferior * exited normally" {break}
+        "Breakpoint" {break}
         "stopped."
     }
     send_gdb "backtrace"
     expect {
         timeout {[debug "backtrace"]}
-        "No stack" {exit 0}
+        "No stack" {break}
         (gdb)
     }
     send_gdb "continue&"
     expect {
         timeout {[debug "continue"]}
-        "The program is not being run" {exit 0}
+        "The program is not being run" {break}
         "Continuing."
     }
 }
+
+send_user "p4-record completed\n"
