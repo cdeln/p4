@@ -1,0 +1,109 @@
+#!/usr/bin/env expect
+
+package require cmdline
+
+set params {
+    {frequency.arg 10       "GDB interrupt and backtrace frequency"}
+    {timeout.arg   3        "Timeout after number of seconds after sending command to GDB"}
+    {threads.arg   1        "Wait for this number of threads before profiling"}
+    {output.arg    "p4.txt" "Output logfile when recording the profile"}
+    {stopat.arg    ""       "Stop profiling at this GDB location"}
+    {verbose                "Show GDB profile session at stdout as well"}
+}
+
+set usage {[opts...] prog [args...]}
+
+try {
+    array set opts [cmdline::getoptions ::argv $params $usage]
+} trap {CMDLINE USAGE} {msg} {
+    puts $msg
+    exit 0
+} trap {CMDLINE ERROR} {msg} {
+    puts $msg
+    exit 1
+}
+
+set sleeptime [expr 1.0 / $opts(frequency)]
+set timeout $opts(timeout)
+set num_threads $opts(threads)
+
+if {[llength $argv] < 1} {
+    puts "Missing argument 'prog'"
+    puts "p4-record $usage"
+    exit 1
+}
+
+set prog [lindex $argv 0]
+set args [lrange $argv 1 end]
+
+# Simplify sending commands to GDB a bit using this proc.
+proc send_gdb {cmd} {
+    send [string cat $cmd "\r"]
+}
+
+# Sometimes GDB sends back an unexpected string.
+# This can be handled in the timeout clause of the expect command using this proc.
+# Effect is that the user drops into the debugger when it does not behave as expected.
+proc debug {what} {
+    send_user "FAILED: [string toupper $what]\n"
+    send_gdb "interrupt"
+    interact
+}
+
+log_file -a -noappend $opts(output)
+log_user [expr {$opts(verbose) ? 1 : 0}]
+
+# Startup GDB
+spawn gdb -q \
+    -ex "set disable-randomization off" \
+    -ex "set style enabled off" \
+    -ex "set source open on" \
+    -ex "set print address off" \
+    -ex "set print frame-arguments none" \
+    -ex "set print frame-info short-location" \
+    -ex "set non-stop on" \
+    -ex "set pagination off" \
+    --args $prog {*}$args
+
+# Wait until main is reached
+expect {(gdb)}
+send_gdb "break main"
+send_gdb "run"
+expect {(gdb)}
+
+# Setup additional breakpoints
+if {$opts(stopat) ne ""} {
+    send_gdb "break $opts(stopat)"
+}
+
+# Run!
+send_gdb "continue&"
+
+# Wait for threads to start up
+for {set i 0} {$i < $num_threads} {incr i} {
+    expect {New Thread}
+}
+
+# Profile!
+while {1} {
+    sleep $sleeptime
+    send_gdb "interrupt"
+    expect {
+        timeout {[debug "interrupt"]}
+        "Inferior * exited normally" {exit 0}
+        "Breakpoint" {exit 0}
+        "stopped."
+    }
+    send_gdb "backtrace"
+    expect {
+        timeout {[debug "backtrace"]}
+        "No stack" {exit 0}
+        (gdb)
+    }
+    send_gdb "continue&"
+    expect {
+        timeout {[debug "continue"]}
+        "The program is not being run" {exit 0}
+        "Continuing."
+    }
+}

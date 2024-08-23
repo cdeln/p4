@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+profile=p4.txt
+
+usage="p4-report [-profile p4.txt] [-help]"
+
+while (( $# )); do
+    case $1 in
+        -profile)
+            profile=$2
+            shift 1
+            ;;
+        -help)
+            echo "$usage"
+            exit
+            ;;
+        *)
+            echo "Unrecognized argument: $1"
+            exit 1
+            ;;
+    esac
+done
+
+if [ ! -f "$profile" ]; then
+    echo "Missing profile @ $profile, did you run p4-record?"
+    exit 1
+fi
+
+cwd=$(dirname ${BASH_SOURCE[0]})
+$cwd/p4-collect $profile | sort | uniq -c | sort -n
