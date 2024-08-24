@@ -1,0 +1,28 @@
+.TH p4-report 1
+.SH NAME
+p4-report \- Process profiles recorded with \fBp4-record\fR
+.SH SYNOPSIS
+.B p4-report
+[\fIOPTIONS\fR...]
+.SH DESCRIPTION
+Process a profile recorded with \fBp4-record\fR and summarize it in a human readable format.
+.PP
+The report is formatted with two columns, the first displays the number of times a certain stack trace was encountered, the second displays a comma separated stack trace.
+.PP
+When profiling a C++ program, the stack traces can look broken due to name mangling. Function overloading, operators and templates puts commas and spaces in the name of the functions, which slightly interferes with the meaning of comma in the report. Nevertheless, the stack trace should contain all \fBnecessary\fR information to understand it, but it might not be \fBcomplete\fR.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-help
+Display a help message with usage information
+.TP
+\fB\-profile \fIFILE
+Read profile from \fIFILE\fR. Default is profile.p4
+.TP
+\fB\-report \fIFILE
+Write report to \fIFILE\fR.
+Default is report.p4, which will be overwritten on consecutive runs. The profile might contain non-printable characters, and while it is possible to report to standard output with \fB\-report /dev/stdout\fR, it is recommended to open the report in a file viewer that supports non-printable characters such as \fBvim\fR or \fBemacs\fR.
+.SH SEE ALSO
+.BR p4-record (1)
+.PP
+.BR vim (1),
+.BR emacs (1)

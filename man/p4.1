@@ -1,0 +1,36 @@
+.TH p4 1
+.SH NAME
+p4 \- Statistical profiler that works with blocking calls
+.SH SYNOPSIS
+.B p4
+[\fIOPTIONS\fR...]
+\fBrecord\fR|\fBreport
+\fR[\fIARGS\fR...]
+.SH DESCRIPTION
+.B p4
+is a simple statistical profiler based on
+.BR gdb (1)
+for analyzing C/C++ programs that works with multiple threads and blocking calls.
+.PP
+It works by continously interrupting and collecting stack traces from a program attached to a
+.BR gdb
+session.
+.PP
+The interaction with
+.BR gdb
+is performed using
+.BR expect (1)
+.PP
+.BR p4
+is a wrapper for a family of commands further documented in their own pages.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-help
+Display a help message with usage information
+.SH SEE ALSO
+Commands:
+.BR p4-record (1),
+.BR p4-report (1)
+.PP
+.B p4
+is an abbreviation of Poor Persons Probabilistic Profiler and is based on the Poor Man's Profiler: https://poormansprofiler.org
