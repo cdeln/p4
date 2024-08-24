@@ -2,7 +2,19 @@
 
 cmd_regex="record|report"
 
-usage="p4 $cmd_regex [args...]"
+usage="p4 [-help|-h] $cmd_regex [args...]"
+
+while (( $# )); do
+    case $1 in
+        -help|-h)
+            echo "$usage"
+            exit
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 if (( $# < 1 )); then
     echo "Missing command"
