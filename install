@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-prefix=/usr/local/bin
+prefix=/usr/local
 
-usage="install [-prefix /usr/local/bin] [-help|-h]"
+usage="install [-prefix $prefix] [-help|-h]"
 
 while (( $# )); do
     case $1 in
@@ -26,10 +26,11 @@ if [ -f $prefix ]; then
     exit
 fi
 
-if [ ! -d $prefix ]; then
-    mkdir -p $prefix
-fi
+prefix_bin=$prefix/bin
+prefix_man=$prefix/man
 
-for f in src/* ; do
-    cp $f $prefix/
-done
+mkdir -p $prefix_bin
+mkdir -p $prefix_man/man1
+
+cp src/* $prefix_bin/
+cp man/*.1 $prefix_man/man1/
