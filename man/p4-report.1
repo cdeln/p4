@@ -12,7 +12,7 @@ The report is formatted with two columns, the first displays the number of times
 When profiling a C++ program, the stack traces can look broken due to name mangling. Function overloading, operators and templates puts commas and spaces in the name of the functions, which slightly interferes with the meaning of comma in the report. Nevertheless, the stack trace should contain all \fBnecessary\fR information to understand it, but it might not be \fBcomplete\fR.
 .SH OPTIONS
 .TP
-.BR \-h ", " \-help
+.BR \-? ", " \-h ", " \-help
 Display a help message with usage information
 .TP
 \fB\-profile \fIFILE
@@ -21,6 +21,13 @@ Read profile from \fIFILE\fR. Default is profile.p4
 \fB\-report \fIFILE
 Write report to \fIFILE\fR.
 Default is report.p4, which will be overwritten on consecutive runs. The profile might contain non-printable characters, and while it is possible to report to standard output with \fB\-report /dev/stdout\fR, it is recommended to open the report in a file viewer that supports non-printable characters such as \fBvim\fR or \fBemacs\fR.
+.TP
+\fB\-reverse\fR
+Write report in reversed order (puts hotspot at the bottom). Useful if reporting to standard output (see \fB-verbose\fR).
+.TP
+\fB\-verbose\fR
+Display the report at standard output as well.
+Useful to quickly get report, but note that non-printable characters might hide some information (see \fB-report\fR).
 .SH SEE ALSO
 .BR p4-record (1)
 .PP

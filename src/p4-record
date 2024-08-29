@@ -5,12 +5,12 @@ package require cmdline
 set cwd [file dirname [file normalize [info script]]]
 
 set params {
-    {frequency.arg 10           "GDB interrupt and backtrace frequency (inverse sleep time in Expect). Biased measure of sampling rate."}
+    {rate.arg      10           "GDB interrupt and backtrace frequency (inverse sleep time in Expect). Biased measure of sampling rate"}
     {timeout.arg   3            "Timeout after number of seconds after sending command to GDB"}
     {threads.arg   0            "Wait for this number of threads before profiling"}
-    {output.arg    "profile.p4" "Output logfile when recording the profile"}
     {stopat.arg    ""           "Stop profiling at this GDB location"}
-    {verbose                    "Show GDB profile session at stdout as well"}
+    {profile.arg   "profile.p4" "Output file to write the profile into"}
+    {verbose                    "Show GDB profile session at standard output as well"}
 }
 
 set usage {[opts...] prog [args...]}
@@ -25,7 +25,7 @@ try {
     exit 1
 }
 
-set sleeptime [expr 1.0 / $opts(frequency)]
+set sleeptime [expr 1.0 / $opts(rate)]
 set timeout $opts(timeout)
 set num_threads $opts(threads)
 
@@ -52,7 +52,7 @@ proc debug {what} {
     interact
 }
 
-log_file -a -noappend $opts(output)
+log_file -a -noappend $opts(profile)
 log_user [expr {$opts(verbose) ? 1 : 0}]
 
 # Startup GDB

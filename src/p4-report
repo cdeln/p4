@@ -2,8 +2,17 @@
 
 profile=profile.p4
 report=report.p4
+reverse=off
+verbose=off
 
-usage="p4-report [-profile profile.p4] [-report report.p4] [-help|-h]"
+usage="p4-report [opts...]
+ -profile        Input file to read the profile from <profile.p4>
+ -report         Ouptut file to write the report into <report.p4>
+ -reverse        Reverse the report order (puts hotspot at bottom).
+ -verbose        Show report at standard output as well
+ -help           Print this message
+ -?              Print this message
+"
 
 while (( $# )); do
     case $1 in
@@ -15,7 +24,15 @@ while (( $# )); do
             report=${2-}
             shift 2
             ;;
-        -help|-h)
+        -reverse)
+            reverse=on
+            shift
+            ;;
+        -verbose)
+            verbose=on
+            shift
+            ;;
+        -help|-h|-?)
             echo "$usage"
             exit
             ;;
@@ -31,5 +48,14 @@ if [ ! -f "$profile" ]; then
     exit 1
 fi
 
+sortopts=-nr
+if [ $reverse = on ]; then
+    sortopts=-n
+fi
+
 cwd=$(dirname ${BASH_SOURCE[0]})
-$cwd/p4-collect $profile | sort | uniq -c | sort -nr > $report
+if [ $verbose = on ]; then
+    $cwd/p4-collect $profile | sort | uniq -c | sort $sortopts | tee $report
+else
+    $cwd/p4-collect $profile | sort | uniq -c | sort $sortopts > $report
+fi

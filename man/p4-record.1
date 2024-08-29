@@ -13,11 +13,11 @@ The program must be compiled with debug symbols (\fB-g\fR option with \fBgcc\fR 
 The recorded profile can be analyzed with \fBp4-report\fR.
 .SH OPTIONS
 .TP
-.BR \-h ", " \-help
+.BR \-? ", " \-h ", " \-help
 Display a help message with usage information
 .TP
-\fB\-frequency \fIHERTZ
-Frequency of interrupt and stack trace retrieval of the program. Default is 10Hz. Frequencies up to 100Hz has been demonstrated to work. Increasing it too much can make profiling unstable and even lead to internal GDB crashes, use with care!
+\fB\-rate \fIHERTZ
+Frequency of interrupt and stack trace retrieval of the program (inverse sleep time in Expect). Default is 10Hz. Frequencies up to 100Hz has been demonstrated to work. Increasing it too much can make profiling unstable and even lead to internal GDB crashes, use with care! Note that this is a biased measure of the sampling rate, which will always be less than specified due to overhead.
 .TP
 \fB\-timeout \fISECONDS
 Timeout after number of seconds after sending command to GDB. Default is 3 seconds. If the timeout is reached, control will be given back to the user by dropping back into the GDB session interactively. Decreasing it too low might give false positives.
@@ -25,13 +25,13 @@ Timeout after number of seconds after sending command to GDB. Default is 3 secon
 \fB\-threads \fICOUNT\fR
 Wait for this number of threads before profiling. Default is 0. Useful to ensure that profiling does not interfere with thread initialization. The number of threads can be figured out by debugging the program manually once and look for thread start notifications from GDB.
 .TP
-\fB\-output \fIFILE\fR
-Output to \fIFILE\fR when recording.
-Default is profile.p4, which will be overwritten on consecutive runs.
-.TP
 \fB\-stopat \fILINE\fR
 Stop profiling at this GDB location.
 Useful to ensure that profiling does not interfere with teardown code.
+.TP
+\fB\-profile \fIFILE\fR
+Write to \fIFILE\fR when recording.
+Default is profile.p4, which will be overwritten on consecutive runs.
 .TP
 \fB\-verbose\fR
 Display the GDB profile session at standard output as well.
